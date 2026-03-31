@@ -1,6 +1,6 @@
 # KrishiRakshak AI
 
-Hackathon-ready Flask app for crop disease diagnosis, weather advisory, and voice-based farming assistance.
+Flask app for crop disease diagnosis, weather advisory, and voice-based farming assistance.
 
 ## Run Locally
 
