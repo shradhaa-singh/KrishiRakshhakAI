@@ -1,0 +1,110 @@
+import json
+import mimetypes
+import os
+
+from google.genai import Client, types
+
+
+def _fallback_response() -> dict:
+    """Safe fallback response when API key is missing or API fails."""
+    return {
+        "disease_name": "Likely Fungal Leaf Spot (Preliminary)",
+        "causes": [
+            "High moisture and poor air circulation around leaves.",
+            "Contaminated soil or infected plant residue in the field.",
+        ],
+        "treatment": [
+            "Remove and destroy heavily infected leaves.",
+            "Use a suitable fungicide recommended by local agriculture experts.",
+            "Avoid overhead irrigation during late evening.",
+        ],
+        "preventive_measures": [
+            "Maintain proper spacing between plants.",
+            "Rotate crops and keep field hygiene strong.",
+            "Inspect crops early in the morning for first signs of infection.",
+        ],
+        "note": "This is a fallback advisory. Add GEMINI_API_KEY in .env for real AI image diagnosis.",
+    }
+
+
+def _create_client(api_key: str) -> Client:
+    return Client(api_key=api_key)
+
+
+def analyze_crop_image(image_path: str) -> dict:
+    """
+    Analyze crop image using Gemini and return structured, farmer-friendly output.
+    Falls back to a static structured result if key/config is unavailable.
+    """
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        return _fallback_response()
+
+    client = _create_client(api_key)
+    model_name = "models/gemini-2.5-flash"
+
+    mime_type = mimetypes.guess_type(image_path)[0] or "image/jpeg"
+    with open(image_path, "rb") as image_file:
+        image_bytes = image_file.read()
+
+    prompt = (
+        "You are an expert agricultural diagnostician helping farmers. "
+        "Analyze this crop image and return JSON only with keys: "
+        "disease_name (string), causes (array of strings), treatment (array of strings), "
+        "preventive_measures (array of strings). "
+        "Keep language simple and practical for Indian farmers."
+    )
+
+    try:
+        response = client.models.generate_content(
+            model=model_name,
+            contents=[
+                types.Part.from_text(text=prompt),
+                types.Part.from_bytes(data=image_bytes, mime_type=mime_type),
+            ],
+        )
+        text = (response.text or "").strip()
+
+        cleaned = text.replace("```json", "").replace("```", "").strip()
+        parsed = json.loads(cleaned)
+        required = {"disease_name", "causes", "treatment", "preventive_measures"}
+        if not required.issubset(parsed.keys()):
+            raise ValueError("Gemini response missing expected keys.")
+        return parsed
+    except Exception:
+        return _fallback_response()
+
+
+def ask_farming_question(message: str) -> str:
+    """
+    Chat helper for farmer Q&A.
+    Falls back to safe static text when API key is unavailable or API fails.
+    """
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        return (
+            "I am in demo mode. For healthy crops, monitor leaves daily, irrigate early "
+            "morning, and remove infected parts quickly. Add GEMINI_API_KEY for live AI answers."
+        )
+
+    try:
+        client = _create_client(api_key)
+        model_name = "models/gemini-2.5-flash"
+        prompt = (
+            "You are KrishiRakshak AI, a practical farming assistant. "
+            "Respond in simple, short, actionable language for farmers in India."
+        )
+        response = client.models.generate_content(
+            model=model_name,
+            contents=[
+                types.Part.from_text(text=prompt),
+                types.Part.from_text(text=message),
+            ],
+        )
+        text = (response.text or "").strip()
+        return text or "I could not generate a response. Please try again."
+    except Exception:
+        return (
+            "Unable to connect to AI right now. Please try again in a moment. "
+            "Meanwhile, inspect crop leaves and soil moisture before applying treatment."
+        )

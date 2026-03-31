@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KrishiRakshak AI - Weather</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body data-page="weather">
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+  <header class="site-header glass">
+    <a class="logo" href="{{ url_for('main.home') }}">KrishiRakshak AI</a>
+    <button class="menu-toggle" id="menuToggle" aria-label="Open menu">Menu</button>
+    <nav class="site-nav" id="siteNav">
+      <a href="{{ url_for('main.home') }}">Home</a>
+      <a href="{{ url_for('main.detect_page') }}">Detect</a>
+      <a href="{{ url_for('main.chat_page') }}">Chat</a>
+      <a href="{{ url_for('main.weather_page') }}" class="active">Weather</a>
+      <a href="{{ url_for('main.voice_page') }}">Voice</a>
+    </nav>
+  </header>
+
+  <main class="page">
+    <section class="panel glass tilt-card">
+      <h1>Weather Insights</h1>
+      <p class="subtext">Check local weather for better farming decisions.</p>
+      <div class="chat-input-row">
+        <input id="cityInput" type="text" placeholder="Enter city name" />
+        <button class="btn btn-primary" id="fetchWeatherBtn">Fetch Weather</button>
+      </div>
+      <div class="spinner-wrap hidden" id="weatherLoading">
+        <div class="spinner"></div>
+        <p>Fetching weather...</p>
+      </div>
+      <div id="weatherError" class="alert hidden"></div>
+      <div class="weather-grid" id="weatherGrid">
+        <article class="weather-card glass"><p>Temperature</p><h3 id="wTemp">--</h3></article>
+        <article class="weather-card glass"><p>Humidity</p><h3 id="wHumidity">--</h3></article>
+        <article class="weather-card glass"><p>Condition</p><h3 id="wCondition">--</h3></article>
+      </div>
+      <article class="suggestion-card glass">
+        <h3>Farming Suggestion</h3>
+        <p id="wSuggestion">Weather-driven guidance will appear here.</p>
+        <p id="wNote" class="weather-note hidden"></p>
+      </article>
+    </section>
+  </main>
+
+  <footer class="site-footer glass">
+    <p>© 2026 KrishiRakshak AI</p>
+    <div class="footer-links">
+      <a href="{{ url_for('main.detect_page') }}">Detect</a>
+      <a href="{{ url_for('main.weather_page') }}">Weather</a>
+    </div>
+  </footer>
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

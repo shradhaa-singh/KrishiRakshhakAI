@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KrishiRakshak AI - Home</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body data-page="home">
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+
+  <header class="site-header glass">
+    <a class="logo" href="{{ url_for('main.home') }}">KrishiRakshak AI</a>
+    <button class="menu-toggle" id="menuToggle" aria-label="Open menu">Menu</button>
+    <nav class="site-nav" id="siteNav">
+      <a href="{{ url_for('main.home') }}" class="active">Home</a>
+      <a href="{{ url_for('main.detect_page') }}">Detect</a>
+      <a href="{{ url_for('main.chat_page') }}">Chat</a>
+      <a href="{{ url_for('main.weather_page') }}">Weather</a>
+      <a href="{{ url_for('main.voice_page') }}">Voice</a>
+    </nav>
+  </header>
+
+  <main class="page">
+    <section class="hero glass tilt-card">
+      <div class="hero-left">
+        <p class="eyebrow">AI-powered agriculture assistant</p>
+        <h1>Protect Your Crops with AI Precision</h1>
+        <p class="subtext">Detect crop disease, ask farming questions, get weather insights, and use voice assistance in one clean dashboard.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="{{ url_for('main.detect_page') }}">Diagnose Crop</a>
+          <a class="btn btn-secondary" href="{{ url_for('main.chat_page') }}">Ask AI</a>
+        </div>
+      </div>
+      <div class="hero-right">
+        <div class="spotlight-card glass tilt-card">
+          <p class="spotlight-label">Live Toolkit</p>
+          <h3>Detect • Chat • Weather • Voice</h3>
+          <p>Built for fast field decisions with farmer-friendly guidance and safe fallbacks.</p>
+          <div class="spotlight-meta">
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer glass">
+    <p>© 2026 KrishiRakshak AI</p>
+    <div class="footer-links">
+      <a href="{{ url_for('main.detect_page') }}">Detect</a>
+      <a href="{{ url_for('main.weather_page') }}">Weather</a>
+
+</html>
