@@ -4,21 +4,6 @@
 
 ---
 
-## 📋 Table of Contents
-
-- [Overview](#overview)
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-- [API Reference](#api-reference)
-- [Usage Guide](#usage-guide)
-- [Troubleshooting](#troubleshooting)
-- [Production Deployment](#production-deployment)
-- [Future Enhancements](#future-enhancements)
-
----
-
 ## 🎯 Overview
 
 **KrishiRakshak AI** is a full-stack web application designed to assist farmers with:
