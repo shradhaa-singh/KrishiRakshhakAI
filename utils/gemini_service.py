@@ -2,7 +2,7 @@ import json
 import mimetypes
 import os
 
-from google.genai import Client, types
+import google.generativeai as genai
 
 
 def _fallback_response() -> dict:
@@ -27,8 +27,9 @@ def _fallback_response() -> dict:
     }
 
 
-def _create_client(api_key: str) -> Client:
-    return Client(api_key=api_key)
+def _get_model(api_key: str):
+    genai.configure(api_key=api_key)
+    return genai.GenerativeModel("gemini-2.0-flash")
 
 
 def analyze_crop_image(image_path: str) -> dict:
@@ -40,12 +41,11 @@ def analyze_crop_image(image_path: str) -> dict:
     if not api_key:
         return _fallback_response()
 
-    client = _create_client(api_key)
-    model_name = "models/gemini-2.5-flash"
+    model = _get_model(api_key)
 
     mime_type = mimetypes.guess_type(image_path)[0] or "image/jpeg"
     with open(image_path, "rb") as image_file:
-        image_bytes = image_file.read()
+        image_data = image_file.read()
 
     prompt = (
         "You are an expert agricultural diagnostician helping farmers. "
@@ -56,12 +56,14 @@ def analyze_crop_image(image_path: str) -> dict:
     )
 
     try:
-        response = client.models.generate_content(
-            model=model_name,
-            contents=[
-                types.Part.from_text(text=prompt),
-                types.Part.from_bytes(data=image_bytes, mime_type=mime_type),
-            ],
+        response = model.generate_content(
+            [
+                prompt,
+                {
+                    "mime_type": mime_type,
+                    "data": image_data,
+                },
+            ]
         )
         text = (response.text or "").strip()
 
@@ -71,7 +73,8 @@ def analyze_crop_image(image_path: str) -> dict:
         if not required.issubset(parsed.keys()):
             raise ValueError("Gemini response missing expected keys.")
         return parsed
-    except Exception:
+    except Exception as e:
+        print(f"[DEBUG] Image Analysis Error: {str(e)}")
         return _fallback_response()
 
 
@@ -88,22 +91,17 @@ def ask_farming_question(message: str) -> str:
         )
 
     try:
-        client = _create_client(api_key)
-        model_name = "models/gemini-2.5-flash"
+        model = _get_model(api_key)
         prompt = (
             "You are KrishiRakshak AI, a practical farming assistant. "
-            "Respond in simple, short, actionable language for farmers in India."
+            "Respond in simple, short, actionable language for farmers in India. "
+            f"User question: {message}"
         )
-        response = client.models.generate_content(
-            model=model_name,
-            contents=[
-                types.Part.from_text(text=prompt),
-                types.Part.from_text(text=message),
-            ],
-        )
+        response = model.generate_content(prompt)
         text = (response.text or "").strip()
         return text or "I could not generate a response. Please try again."
-    except Exception:
+    except Exception as e:
+        print(f"[DEBUG] Gemini API Error: {str(e)}")
         return (
             "Unable to connect to AI right now. Please try again in a moment. "
             "Meanwhile, inspect crop leaves and soil moisture before applying treatment."
