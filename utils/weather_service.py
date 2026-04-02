@@ -33,7 +33,6 @@ def _demo_weather(city: str) -> dict:
         "humidity": humidity,
         "condition": "Partly Cloudy (Demo)",
         "suggestions": _suggestions_from_weather(temp_c, humidity),
-        "note": "Demo weather shown. Add WEATHER_API_KEY in .env or check network access for live data.",
     }
 
 
