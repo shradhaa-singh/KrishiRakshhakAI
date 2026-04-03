@@ -1,8 +1,9 @@
 import json
 import mimetypes
 import os
+from PIL import Image
 
-import google.generativeai as genai
+from google import genai
 
 
 def _fallback_response() -> dict:
@@ -27,11 +28,6 @@ def _fallback_response() -> dict:
     }
 
 
-def _get_model(api_key: str):
-    genai.configure(api_key=api_key)
-    return genai.GenerativeModel("gemini-2.0-flash")
-
-
 def analyze_crop_image(image_path: str) -> dict:
     """
     Analyze crop image using Gemini and return structured, farmer-friendly output.
@@ -41,7 +37,7 @@ def analyze_crop_image(image_path: str) -> dict:
     if not api_key:
         return _fallback_response()
 
-    model = _get_model(api_key)
+    client = genai.Client(api_key=api_key)
 
     mime_type = mimetypes.guess_type(image_path)[0] or "image/jpeg"
     with open(image_path, "rb") as image_file:
@@ -56,14 +52,16 @@ def analyze_crop_image(image_path: str) -> dict:
     )
 
     try:
-        response = model.generate_content(
-            [
+        response = client.models.generate_content(
+            model='gemini-2.0-flash',
+            contents=[
                 prompt,
                 {
                     "mime_type": mime_type,
                     "data": image_data,
                 },
-            ]
+            ],
+            config={'response_mime_type': 'application/json'}
         )
         text = (response.text or "").strip()
 
@@ -91,13 +89,16 @@ def ask_farming_question(message: str) -> str:
         )
 
     try:
-        model = _get_model(api_key)
+        client = genai.Client(api_key=api_key)
         prompt = (
             "You are KrishiRakshak AI, a practical farming assistant. "
             "Respond in simple, short, actionable language for farmers in India. "
             f"User question: {message}"
         )
-        response = model.generate_content(prompt)
+        response = client.models.generate_content(
+            model='gemini-2.0-flash',
+            contents=prompt
+        )
         text = (response.text or "").strip()
         return text or "I could not generate a response. Please try again."
     except Exception as e:
