@@ -1,9 +1,12 @@
 import json
 import mimetypes
 import os
-from PIL import Image
 
-from google import genai
+try:
+    from google import genai
+    GENAI_AVAILABLE = True
+except ImportError:
+    GENAI_AVAILABLE = False
 
 
 def _fallback_response() -> dict:
@@ -34,7 +37,7 @@ def analyze_crop_image(image_path: str) -> dict:
     Falls back to a static structured result if key/config is unavailable.
     """
     api_key = os.getenv("GEMINI_API_KEY")
-    if not api_key:
+    if not api_key or not GENAI_AVAILABLE:
         return _fallback_response()
 
     client = genai.Client(api_key=api_key)
@@ -82,7 +85,7 @@ def ask_farming_question(message: str) -> str:
     Falls back to safe static text when API key is unavailable or API fails.
     """
     api_key = os.getenv("GEMINI_API_KEY")
-    if not api_key:
+    if not api_key or not GENAI_AVAILABLE:
         return (
             "I am in demo mode. For healthy crops, monitor leaves daily, irrigate early "
             "morning, and remove infected parts quickly. Add GEMINI_API_KEY for live AI answers."
