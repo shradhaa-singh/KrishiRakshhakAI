@@ -91,9 +91,9 @@ KrishiRakshakAI/
 ### Prerequisites
 - Python 3.8+
 - pip or conda
-- API keys:
-  - Google Gemini API
-  - OpenWeatherMap (or equivalent weather API)
+- API keys are optional for initial deploy:
+  - Google Gemini API (optional; app runs in demo fallback mode without it)
+  - OpenWeatherMap API (optional; weather uses demo data without it)
 
 ### Installation
 
@@ -116,16 +116,22 @@ KrishiRakshakAI/
 
 4. **Set up environment variables**
    
-   Create a `.env` file in the project root:
+   Copy `.env.example` to `.env` and update values as needed:
+   ```bash
+   cp .env.example .env
+   ```
+
+   `.env` example:
    ```
    FLASK_APP=app.py
-   FLASK_ENV=development
+   FLASK_ENV=production
    GEMINI_API_KEY=<your-gemini-api-key>
    WEATHER_API_KEY=<your-weather-api-key>
-   SECRET_KEY=<your-secret-key>
+   FLASK_SECRET_KEY=<your-secret-key>
    UPLOAD_FOLDER=uploads
-   MAX_CONTENT_LENGTH=16777216
+   MAX_CONTENT_LENGTH=8388608
    ```
+   If `GEMINI_API_KEY` or `WEATHER_API_KEY` is empty, the app still works in demo mode.
 
 5. **Run the application**
    ```bash
@@ -193,9 +199,8 @@ KrishiRakshakAI/
 **Problem:** 500 error from `/api/chat`
 
 **Solutions:**
-- Verify Gemini API key is set in `.env`
-- Check API quota not exceeded
-- Ensure internet connection
+- If no key is configured, response should still work in demo mode
+- If key is configured, verify quota and connectivity
 - Review Flask logs for detailed error
 
 
@@ -213,9 +218,8 @@ KrishiRakshakAI/
 **Problem:** City not found or 500 error
 
 **Solutions:**
-- Verify weather API key is correct
-- Check city name spelling
-- Ensure API quota not exceeded
+- If no key is configured, app returns demo weather safely
+- If key is configured, verify key, city spelling, and quota
 - Fall back to popular city names (Delhi, Mumbai, Bangalore)
 
 ---
@@ -243,6 +247,5 @@ KrishiRakshakAI/
 
 ---
 
-**Last Updated:** April 2, 2026  
+**Last Updated:** April 9, 2026  
 **Version:** 1.0.0
-

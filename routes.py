@@ -21,6 +21,12 @@ def home():
     return render_template("index.html")
 
 
+@main_bp.route("/health", methods=["GET"])
+def health():
+    """Lightweight health check for deployment platforms."""
+    return jsonify({"success": True, "status": "ok"}), 200
+
+
 @main_bp.route("/detect", methods=["GET"])
 def detect_page():
     return render_template("detect.html")

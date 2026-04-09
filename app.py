@@ -11,9 +11,10 @@ def create_app() -> Flask:
     load_dotenv()
 
     app = Flask(__name__)
-    app.config["SECRET_KEY"] = os.getenv("FLASK_SECRET_KEY", "dev-secret-key")
-    app.config["MAX_CONTENT_LENGTH"] = 8 * 1024 * 1024  # 8 MB upload limit
-    app.config["UPLOAD_FOLDER"] = "uploads"
+    # Accept both names so deploy environments remain backward-compatible.
+    app.config["SECRET_KEY"] = os.getenv("FLASK_SECRET_KEY") or os.getenv("SECRET_KEY") or "dev-secret-key"
+    app.config["MAX_CONTENT_LENGTH"] = int(os.getenv("MAX_CONTENT_LENGTH", str(8 * 1024 * 1024)))
+    app.config["UPLOAD_FOLDER"] = os.getenv("UPLOAD_FOLDER", "uploads")
 
     os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
     app.register_blueprint(main_bp)
